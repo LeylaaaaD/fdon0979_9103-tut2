@@ -1,21 +1,9 @@
 # fdon0979_9103-tut2
 
-THIS IS A README FILE
+# Part 1 : Imaging Technique Inspiration
+I want to chose the pointillism technique because I think the original artwork "San Giorgio Maggiore at Dusk" is characterized by short, small strokes. By using this technique to create the image with small dots, we could capture and reproduce the subtle variations in colour and details more accurately. And the present way may be more akin to the way diamond painting presents art. And this technique also holds the potential for adding animations like colour changes or movements, making the artwork more appealing and interactive.
 
-# Header 1
-## Header 2
-### Header 3
-#### Header 4
-##### Header 5
-###### Header 6
-- Item 1
-- Item 2
-  - Subitem 2.1
-  - Subitem 2.2
-[Link Text](https://www.google.com
-Links to an external site.)
-![An image of a cat](http://placekitten.com/200/300
-Links to an external site.)
-![An image of the Mona Lisa](readmeImages/Mona_Lisa_by_Leonardo_da_Vinci_500_x_700.jpg
-Links to an external site.)
+![the pointillism technique](Pointillism-Art.jpeg)
+![the diamond painting present way](Diamond-Dotz---London-Parliament-In-Winter-_Apres-Monet_-46x41cm---Diamond-Art-Diamond-Art-Diamond-Dotz-1622783156.jpeg)
+
 
