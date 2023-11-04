@@ -14,9 +14,10 @@ function preload() {
 function setup() {
   createCanvas(300, 600);
   background(242,169,4); 
-
- 
+  // Create a new FFT analysis object
   fft = new p5.FFT(0.8, 512);
+  // Add the song into the FFT's input
+  song.connect(fft);
 
   //Draw the pink and black dots
   for (let i = 0; i < 700; i++) {
@@ -25,8 +26,6 @@ function setup() {
     let col = color(random(1) > 0.5 ? color(214, 139, 168) : color(0));
     dots.push(new Dot(x, y, col));
   }
-    song.play(0, 1, 1, 53);
-    song.connect(fft);
 
   //Setting attributes for the stem objects that represent huge leaves' stems
   stems = [
@@ -94,23 +93,29 @@ function setup() {
 
 function draw() {
   background(242,169,4);
- 
+
+ // Request fresh data from the FFT analysis
   let spectrum = fft.analyze();
   lerpAmount = 0.5;
 
+// 
   for (let i = 0; i < dots.length; i++) {
     let amp = spectrum[i];
     dots[i].display(amp);
   }
 
+  // Get the energy of the bass from the FFT
   let bass = fft.getEnergy("bass"); 
+  let speed = map(bass, 0, 255, 1, 20);
+  // Set the frame rate based on the bass level
+  frameRate(speed);
+  // Mapping angles with bass amplitude
   let angleOffsetBass = map(bass, 0, 255, -HALF_PI / 4 , -HALF_PI * 1.3);
   let angleOffsetBass1 = map(bass, 0, 255,  -HALF_PI / 4, -HALF_PI * 1.2,);
-  let speed = map(bass, 0, 255, 1, 20);
-  frameRate(speed);
-
-  let trebleEnergy = fft.getEnergy("treble"); 
-  let angleOffsetTreble = map(trebleEnergy, 0, 255, HALF_PI * 1.2, TWO_PI);
+  
+  // Get the energy of the treble from the FFT and mapping angle with the treble
+  let treble = fft.getEnergy("treble"); 
+  let angleOffsetTreble = map(treble, 0, 255, HALF_PI * 1.2, TWO_PI);
   
   //Calling functions to draw three huge grass 
   grass(angleOffsetBass);
@@ -148,8 +153,13 @@ function draw() {
   fill(229, 82, 139);  
   ellipse(115, 455, 45, 30);  
   
-  //Display all the class object that were setup in setup function
-  for (let grass of smallerGrass) {
+  for (let i = 0; i < smallerGrass.length; i++) {
+    let grass = smallerGrass[i];
+    if (i % 2 === 0) { 
+      grass.update(treble);
+    } else {
+      grass.update(bass);
+    }
     grass.display();
   }
 
@@ -353,9 +363,9 @@ function CurvedWeeds() {
   let numWeeds = 5;
   let weedSpacing = 160 / numWeeds;
   let weedWidth = 3;
+  let minWeedHeight = 5;
+  let maxWeedHeight = 60;
   let controlOffset = 20;
-
-  let waveform = fft.waveform();
 
   //Use a for loop to give some randomness to color setting of the curves
   for (let i = 0; i <= numWeeds; i++) {
@@ -366,12 +376,10 @@ function CurvedWeeds() {
     }
     strokeWeight(weedWidth);
 
-    let waveIndex = Math.floor(map(i, 0, numWeeds, 0, waveform.length));
-    let weedHeight = map(waveform[waveIndex], -1, 1, 20, 80);
-
     // Drawing curved weeds on the bottom
     let x = i * weedSpacing;
     x = constrain(x, 0, 180);
+    let weedHeight = random(minWeedHeight, maxWeedHeight);
     let ctrlPt1X = constrain(x + random(-controlOffset, controlOffset), 0, width);
     let ctrlPt2X = constrain(x + random(-controlOffset, controlOffset), 0, width);
     bezier(x, height, ctrlPt1X, height - weedHeight / 3, ctrlPt2X, height - 2 * weedHeight / 3, x, height - weedHeight);
@@ -458,9 +466,27 @@ class Small {
     this.strokeW = strokeW;
     this.lineLength = lineLength;
     this.angleMultiplier = angleMultiplier;
+    this.angle = 0;
+    this.startRotationTime = 73;
+    this.changeRotationTime = 139;
+    this.changeRotationTime1 = 160;
+    this.endRotationTime = 192;
+  }
+
+  update (amp) {
+    if (song.currentTime() > this.endRotationTime) {
+      this.angle = 0;if (song.currentTime() > this.endRotationTime);
+    } else if (song.currentTime() > this.changeRotationTime) {
+      this.angle += map(amp, 0, 255, 0, HALF_PI);
+    } else if (song.currentTime() > this.startRotationTime) {
+      this.angle += map(amp, 0, 255, 0, PI / 10);
+    }
   }
 
   display() {
+    push();
+    rotate(this.angle); 
+
     //set color and draw the center ellipse
     fill(this.color);
     ellipse(this.x, this.y, this.circleRadius * 2);
@@ -490,6 +516,7 @@ class Small {
       }
       endShape();
     }
+   pop();
   }
 }
 
@@ -583,6 +610,6 @@ function mousePressed() {
   if (song.isPlaying()) {
   song.pause();
   } else {
-  song.play();
+  song.play(0, 1, 1, 53);
   }
-  }
+}
