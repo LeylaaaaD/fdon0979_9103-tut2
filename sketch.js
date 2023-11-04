@@ -6,6 +6,9 @@ let dots = [];
 let song;
 let fft;
 let lerpAmount;
+let amplitude;
+let redDotStarttime = 140; 
+let redDotEndtime = 154; 
 
 function preload() {
   song = loadSound("audio/ray-chen-waltzing-matilda.mp3");
@@ -36,22 +39,22 @@ function setup() {
 
   //Setting attributes for the Leave objects that represent huge leaves' blade 
   leave = [
-    new Leave(30, 140, 45, 120, 75, 105, 19, 18, 19, 1, 4, 6, 0, 0, 0),
-    new Leave(20, 138, 35, 145, 50, 155, 19, 18, 19, 1, 4, 6, 0, 0, 0)
+    new Leave(30, 140, 45, 120, 75, 105, 19, 18, 19, 1, 4, 6, color(0, 0, 0)),
+    new Leave(20, 138, 35, 145, 50, 155, 19, 18, 19, 1, 4, 6, color(0, 0, 0)),
   ];
 
   //Setting attributes for the Smallerleave objects that represent huge leaves' blade
   smallerLeave = [
-    new Smallerleave(35, 140, 65, 120, 80, 110, 27, 20, 19, 2, 5, 6, color(209, 79, 127)),
-    new Smallerleave(25, 140, 45, 140, 80, 160, 27, 21, 19, 2, 5, 6, color(209, 79, 127)),
-    new Smallerleave(8, 300, 10, 295, 20, 285, 6, 10, 12, 2, 5, 6, color(209, 79, 127)),
-    new Smallerleave(8, 300, 3, 312, 10, 340, 7, 10, 13, 5, 6, 6, color(209, 79, 127)),
-    new Smallerleave(0, 300, 5, 295, 12, 285, 1, 2, 13, 1, 4, 10, 0, 0, 0),
-    new Smallerleave(5, 300, 0, 310, 6, 330, 1, 10, 11, 1, 7, 8, 0, 0, 0),
-    new Smallerleave(185, 420, 175, 390, 190, 360, 9, 13, 10, -12, -14, -9, color(209, 79, 127)),
-    new Smallerleave(180, 430, 210, 420, 250, 385, 9, 7, 4, -12, -15, -15, color(209, 79, 127)),
-    new Smallerleave(180, 430, 180, 400, 190, 365, 9, 10, 12, -15, -14, -10, 0, 0, 0),
-    new Smallerleave(185, 420, 220, 410, 250, 385, 10, 7, 4, -14, -14, -13, 0, 0, 0),
+    new Smallerleave(35, 140, 65, 120, 80, 110, 27, 20, 19, 2, 5, 6, color(209, 79, 127), null, null, null, 73, 192),
+    new Smallerleave(25, 140, 45, 140, 80, 160, 27, 21, 19, 2, 5, 6, color(209, 79, 127), null, null, null, 73, 192),
+    new Smallerleave(8, 300, 10, 295, 20, 285, 6, 10, 12, 2, 5, 6, color(209, 79, 127), null, null, null, 76, 192),
+    new Smallerleave(8, 300, 3, 312, 10, 340, 7, 10, 13, 5, 6, 6, color(209, 79, 127), null, null, null, 76, 192),
+    new Smallerleave(0, 300, 5, 295, 12, 285, 1, 2, 13, 1, 4, 10, color(0, 0, 0), null, null, null, 76, 192),
+    new Smallerleave(5, 300, 0, 310, 6, 330, 1, 10, 11, 1, 7, 8, color(0, 0, 0), null, null, null, 76, 192),
+    new Smallerleave(185, 420, 175, 390, 190, 360, 9, 13, 10, -12, -14, -9, color(209, 79, 127), null, null, null, 80, 192),
+    new Smallerleave(180, 430, 210, 420, 250, 385, 9, 7, 4, -12, -15, -15, color(209, 79, 127), null, null, null, 80, 192),
+    new Smallerleave(180, 430, 180, 400, 190, 365, 9, 10, 12, -15, -14, -10, color(0, 0, 0), null, null, null, 80, 192),
+    new Smallerleave(185, 420, 220, 410, 250, 385, 10, 7, 4, -14, -14, -13, color(0, 0, 0), null, null, null, 80, 192),
   ];
 
   //Setting attributes for the Small objects that represent small flower looked grass
@@ -98,31 +101,39 @@ function draw() {
   let spectrum = fft.analyze();
   lerpAmount = 0.5;
 
-// 
+// Iterate over all the 'dots' objects 
   for (let i = 0; i < dots.length; i++) {
     let amp = spectrum[i];
     dots[i].display(amp);
   }
 
-  // Get the energy of the bass from the FFT
+  // Get the energy of the bass and treble from the FFT
   let bass = fft.getEnergy("bass"); 
-  let speed = map(bass, 0, 255, 1, 20);
+  let treble = fft.getEnergy("treble"); 
   // Set the frame rate based on the bass level
+  let speed = map(bass, 0, 255, 2, 24);
   frameRate(speed);
   // Mapping angles with bass amplitude
   let angleOffsetBass = map(bass, 0, 255, -HALF_PI / 4 , -HALF_PI * 1.3);
   let angleOffsetBass1 = map(bass, 0, 255,  -HALF_PI / 4, -HALF_PI * 1.2,);
-  
-  // Get the energy of the treble from the FFT and mapping angle with the treble
-  let treble = fft.getEnergy("treble"); 
-  let angleOffsetTreble = map(treble, 0, 255, HALF_PI * 1.2, TWO_PI);
-  
+  let angleOffsetBass2 = map(bass, 0, 255, HALF_PI * 1.2, TWO_PI);
+
+  // Mapping the bass energy level to a range between 0 and 30
+  let amplitude = map(bass, 0, 255, 0, 30);
+  let amplitude1 = map(bass, 0, 255, 0, 30);
+
+  let waveform = fft.waveform();
+  // Defining a threshold for when the bass is considered to be "high"
+  let bassThreshold = 180; 
+  Kaleidoscope(waveform, bass, bassThreshold);
+
   //Calling functions to draw three huge grass 
   grass(angleOffsetBass);
   grass1(angleOffsetBass1);
-  grass2(angleOffsetTreble);
+  grass2(angleOffsetBass2);
   FlippedGrass(angleOffsetBass);
   FlippedGrass1(angleOffsetBass1);
+
   //Calling functions to draw the weeds at the botton left corner and top right edge
   StraightWeeds();
   CurvedWeeds();
@@ -160,7 +171,7 @@ function draw() {
     } else {
       grass.update(bass);
     }
-    grass.display();
+      grass.display();
   }
 
   for (let stem of stems) {
@@ -168,12 +179,38 @@ function draw() {
   }
   
   for (let sLeaf of smallerLeave) {
+    sLeaf.update(amplitude1);
     sLeaf.display();
   }
 
   for (let leaf of leave) {
+    leaf.update(amplitude);
     leaf.display();
   }
+}
+
+function Kaleidoscope(waveform, bass, bassThreshold) {
+  // Check if the bass level exceeds the threshold
+  if (bass > bassThreshold) {
+    push();
+    translate(width / 2, height / 2); 
+    let density = 2;
+    let numDots = int(waveform.length * density);
+
+    for (let i = 0; i < numDots; i++) {
+      let index = int(random(waveform.length))
+      let angle = map(i, 0, waveform.length, 0, TWO_PI);
+      let amp = waveform[index];
+      let r = map(amp, -1, 1, 0, 250); 
+      let x = r * cos(angle);
+      let y = r * sin(angle);
+
+      fill(255, 0, 0); 
+      noStroke(); 
+      ellipse(x, y, 4, 4); 
+    }
+  }
+  pop();
 }
 
 // Draw the first huge grass
@@ -252,8 +289,8 @@ function grass1(angleOffsetBass1) {
     bezier(x1, y1, x2, y2, x3, y3, x4, y4);  
 
   // Add the red dots align the grass line
-    fill(255, 0, 0);  
     noStroke();  
+    fill(255, 0, 0)
     for (let j = 0; j <= steps; j++) {
       let t = j / steps;
       let px = bezierPoint(x1, x2, x3, x4, t);
@@ -266,7 +303,6 @@ function grass1(angleOffsetBass1) {
 
       px += offsetX;
       py += offsetY;
-
       ellipse(px, py, dotSize, dotSize);
     }
   }
@@ -283,12 +319,12 @@ function FlippedGrass1(angleOffsetBass1) {
 }
 
 // Draw the third huge grass
-function grass2(angleOffsetTreble) {
+function grass2(angleOffsetBass2) {
   noFill();
   strokeWeight(4);
 
     let ellipseCenterX = 115, ellipseCenterY = 460;
-    let numCurves = 18; 
+    let numCurves = 20; 
     let lineLength = 100; 
     let curveAmount = 40; 
  
@@ -300,7 +336,7 @@ function grass2(angleOffsetTreble) {
        stroke(0);      
      }
 
-     let angle = map(i, 2, numCurves, 0, angleOffsetTreble);  
+     let angle = map(i, 2, numCurves, 0, angleOffsetBass2);  
      
      let x1 = ellipseCenterX;
      let y1 = ellipseCenterY;
@@ -317,8 +353,8 @@ function grass2(angleOffsetTreble) {
 
 // Function of the straight weeds
 function StraightWeeds() {
-  let numWeeds = 20;
-  let weedSpacing = 9;
+  let numWeeds = 30;
+  let weedSpacing = 10;
   let weedWidth;
   let minWeedHeight = 20;
   let maxWeedHeight = 50;
@@ -335,12 +371,12 @@ function StraightWeeds() {
     //Setting the stroke attribute using the pre-set values and locate the weeds
     strokeWeight(weedWidth);
     let x = i * weedSpacing;
-    x = constrain(x, 0, 180);
+    x = constrain(x, 0, 300);
     let weedHeight = random(minWeedHeight, maxWeedHeight);
     line(x, height, x, height - weedHeight);
 
     let yRight = i * weedSpacing;
-    yRight = constrain(yRight, 100, 220);
+    yRight = constrain(yRight, 115, 220);
     let rightWeedHeight = random(15, 25);
     line(width, yRight, width - rightWeedHeight, yRight);
   }
@@ -360,8 +396,8 @@ function StraightWeeds() {
 }
 
 function CurvedWeeds() {
-  let numWeeds = 5;
-  let weedSpacing = 160 / numWeeds;
+  let numWeeds = 9;
+  let weedSpacing = 300 / numWeeds;
   let weedWidth = 3;
   let minWeedHeight = 5;
   let maxWeedHeight = 60;
@@ -378,7 +414,7 @@ function CurvedWeeds() {
 
     // Drawing curved weeds on the bottom
     let x = i * weedSpacing;
-    x = constrain(x, 0, 180);
+    x = constrain(x, 0, 300);
     let weedHeight = random(minWeedHeight, maxWeedHeight);
     let ctrlPt1X = constrain(x + random(-controlOffset, controlOffset), 0, width);
     let ctrlPt2X = constrain(x + random(-controlOffset, controlOffset), 0, width);
@@ -386,7 +422,7 @@ function CurvedWeeds() {
 
     // Drawing curved weeds on the left
     let y1 = 450 + i * weedSpacing / 2 ;
-    y1 = constrain(y1, 450, height - 30);
+    y1 = constrain(y1, 450, height - 20);
     weedHeight = random(20, 30);
     let ctrlPtY1 = constrain(y1 + random(-controlOffset, controlOffset), 0, height);
     let ctrlPtY2 = constrain(y1 + random(-controlOffset, controlOffset), 0, height);
@@ -394,7 +430,7 @@ function CurvedWeeds() {
 
     // Drawing curved weeds on the right
     let y2 = 100 + i * weedSpacing / 2;
-    y2 = constrain(y2, 100, 200);
+    y2 = constrain(y2, 115, 200);
     weedHeight = random(15, 20);
     let ctrlPtY3 = constrain(y2 + random(-controlOffset, controlOffset), 0, height);
     let ctrlPtY4 = constrain(y2 + random(-controlOffset, controlOffset), 0, height);
@@ -467,7 +503,7 @@ class Small {
     this.lineLength = lineLength;
     this.angleMultiplier = angleMultiplier;
     this.angle = 0;
-    this.startRotationTime = 73;
+    this.startRotationTime = 103;
     this.changeRotationTime = 139;
     this.changeRotationTime1 = 160;
     this.endRotationTime = 192;
@@ -475,7 +511,7 @@ class Small {
 
   update (amp) {
     if (song.currentTime() > this.endRotationTime) {
-      this.angle = 0;if (song.currentTime() > this.endRotationTime);
+      this.angle = 0;
     } else if (song.currentTime() > this.changeRotationTime) {
       this.angle += map(amp, 0, 255, 0, HALF_PI);
     } else if (song.currentTime() > this.startRotationTime) {
@@ -543,22 +579,35 @@ class Leave {
     this.lColor = lColor;
     this.tX2 = tX2;
     this.tY2 = tY2;
-    this.lAngle = lAngle
+    this.lAngle = lAngle;
+    this.angleOffset = 0;
+    this.startMovetime = 73;
+    this.endMovetime = 192;
+  }
+  
+  update(amplitude) {
+    if (song.currentTime() < this.startMovetime) {
+      this.angleOffset = 0;
+    } else if (song.currentTime() <= this.endMovetime) {
+      this.angleOffset = cos(frameCount * 0.1) * amplitude;
+    } else {
+      this.angleOffset = 0;
+    }
   }
 
   display() {
     for (let i = 0; i < 7; i++) {
       push()
-      translate(this.tX2, this.tY2)
+      translate(this.tX2, this.tY2);
       fill(0);
       stroke(this.lColor);
       strokeWeight(5)
       beginShape();
       curveVertex(this.LX1 + i * this.numA, this.LY1 + i * this.numD);
       curveVertex(this.LX1 + i * this.numA, this.LY1 + i * this.numD);
-      curveVertex(this.LX2 + i * this.numB,this.LY2 + i * this.numE);
-      curveVertex(this.LX3 + i * this.numC,this.LY3 + i * this.numF);
-      curveVertex(this.LX3 + i * this.numC,this.LY3 + i * this.numF);
+      curveVertex(this.LX2 + i * this.numB + this.angleOffset, this.LY2 + i * this.numE);
+      curveVertex(this.LX3 + i * this.numC + this.angleOffset, this.LY3 + i * this.numF);
+      curveVertex(this.LX3 + i * this.numC, this.LY3 + i * this.numF);
       endShape();
       pop()
     }
@@ -567,7 +616,7 @@ class Leave {
 
 class Smallerleave {
   //Similar parameters like leave object except less curve will be made
-  constructor(sX1, sY1, sX2, sY2, sX3, sY3, num1, num2, num3, num4, num5, num6, ColorS, tX3, tY3, AngleS){
+  constructor(sX1, sY1, sX2, sY2, sX3, sY3, num1, num2, num3, num4, num5, num6, ColorS, tX3, tY3, AngleS, startTime, endTime){
     this.sX1 = sX1;
     this.sY1 = sY1;
     this.sX2 = sX2;
@@ -583,10 +632,23 @@ class Smallerleave {
     this.ColorS = ColorS;
     this.tX3 = tX3;
     this.tY3 = tY3;
-    this.AngleS = AngleS
+    this.AngleS = AngleS;
+    this.startTime = startTime; 
+    this.endTime = endTime;  
+    this.angleOffset1 = 0;
   }
 
-  display(){
+  // If the current time is between startMovetime and endMovetime,
+  // the angleOffset will oscillate with a cosine wave, scaled by the amplitude.
+  update(amplitude1) {
+      if (song.currentTime() >= this.startTime && song.currentTime()< this.endTime) {
+        this.angleOffset1 = Math.cos(frameCount * 0.1) * amplitude1;
+      } else {
+        this.angleOffset1 = 0;
+      }
+    }
+
+  display() {
     for (let i = 0; i < 5; i++) {
       push()
       translate(this.tX3, this.tY3)
@@ -596,9 +658,9 @@ class Smallerleave {
       beginShape();
       curveVertex(this.sX1 + i * this.num1, this.sY1 + i * this.num4);
       curveVertex(this.sX1 + i * this.num1, this.sY1 + i * this.num4);
-      curveVertex(this.sX2 + i * this.num2, this.sY2 + i * this.num5);
-      curveVertex(this.sX3 + i * this.num3, this.sY3 + i * this.num6);
-      curveVertex(this.sX3 + i * this.num3, this.sY3 + i * this.num6);
+      curveVertex(this.sX2 + i * this.num2, this.sY2 + i * this.num5 + this.angleOffset1);
+      curveVertex(this.sX3 + i * this.num3, this.sY3 + i * this.num6 + this.angleOffset1);
+      curveVertex(this.sX3 + i * this.num3, this.sY3 + i * this.num6 + this.angleOffset1);
       endShape();
       pop()
     }
