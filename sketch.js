@@ -45,16 +45,16 @@ function setup() {
 
   //Setting attributes for the Smallerleave objects that represent huge leaves' blade
   smallerLeave = [
-    new Smallerleave(35, 140, 65, 120, 80, 110, 27, 20, 19, 2, 5, 6, color(209, 79, 127), null, null, null, 73, 192),
-    new Smallerleave(25, 140, 45, 140, 80, 160, 27, 21, 19, 2, 5, 6, color(209, 79, 127), null, null, null, 73, 192),
-    new Smallerleave(8, 300, 10, 295, 20, 285, 6, 10, 12, 2, 5, 6, color(209, 79, 127), null, null, null, 76, 192),
-    new Smallerleave(8, 300, 3, 312, 10, 340, 7, 10, 13, 5, 6, 6, color(209, 79, 127), null, null, null, 76, 192),
-    new Smallerleave(0, 300, 5, 295, 12, 285, 1, 2, 13, 1, 4, 10, color(0, 0, 0), null, null, null, 76, 192),
-    new Smallerleave(5, 300, 0, 310, 6, 330, 1, 10, 11, 1, 7, 8, color(0, 0, 0), null, null, null, 76, 192),
-    new Smallerleave(185, 420, 175, 390, 190, 360, 9, 13, 10, -12, -14, -9, color(209, 79, 127), null, null, null, 80, 192),
-    new Smallerleave(180, 430, 210, 420, 250, 385, 9, 7, 4, -12, -15, -15, color(209, 79, 127), null, null, null, 80, 192),
-    new Smallerleave(180, 430, 180, 400, 190, 365, 9, 10, 12, -15, -14, -10, color(0, 0, 0), null, null, null, 80, 192),
-    new Smallerleave(185, 420, 220, 410, 250, 385, 10, 7, 4, -14, -14, -13, color(0, 0, 0), null, null, null, 80, 192),
+    new Smallerleave(35, 140, 65, 120, 80, 110, 27, 20, 19, 2, 5, 6, color(209, 79, 127)),
+    new Smallerleave(25, 140, 45, 140, 80, 160, 27, 21, 19, 2, 5, 6, color(209, 79, 127)),
+    new Smallerleave(8, 300, 10, 295, 20, 285, 6, 10, 12, 2, 5, 6, color(209, 79, 127)),
+    new Smallerleave(8, 300, 3, 312, 10, 340, 7, 10, 13, 5, 6, 6, color(209, 79, 127)),
+    new Smallerleave(0, 300, 5, 295, 12, 285, 1, 2, 13, 1, 4, 10, color(0, 0, 0)),
+    new Smallerleave(5, 300, 0, 310, 6, 330, 1, 10, 11, 1, 7, 8, color(0, 0, 0)),
+    new Smallerleave(185, 420, 175, 390, 190, 360, 9, 13, 10, -12, -14, -9, color(209, 79, 127)),
+    new Smallerleave(180, 430, 210, 420, 250, 385, 9, 7, 4, -12, -15, -15, color(209, 79, 127)),
+    new Smallerleave(180, 430, 180, 400, 190, 365, 9, 10, 12, -15, -14, -10, color(0, 0, 0)),
+    new Smallerleave(185, 420, 220, 410, 250, 385, 10, 7, 4, -14, -14, -13, color(0, 0, 0)),
   ];
 
   //Setting attributes for the Small objects that represent small flower looked grass
@@ -110,17 +110,18 @@ function draw() {
   // Get the energy of the bass and treble from the FFT
   let bass = fft.getEnergy("bass"); 
   let treble = fft.getEnergy("treble"); 
+
   // Set the frame rate based on the bass level
-  let speed = map(bass, 0, 255, 2, 24);
+  let speed = map(bass, 0, 255, 5, 24);
   frameRate(speed);
   // Mapping angles with bass amplitude
   let angleOffsetBass = map(bass, 0, 255, -HALF_PI / 4 , -HALF_PI * 1.3);
   let angleOffsetBass1 = map(bass, 0, 255,  -HALF_PI / 4, -HALF_PI * 1.2,);
   let angleOffsetBass2 = map(bass, 0, 255, HALF_PI * 1.2, TWO_PI);
 
-  // Mapping the bass energy level to a range between 0 and 30
-  let amplitude = map(bass, 0, 255, 0, 30);
-  let amplitude1 = map(bass, 0, 255, 0, 30);
+  // Mapping the bass energy level to a range 
+  let amplitude = map(bass, 0, 255, 0, 10);
+  let amplitude1 = map(bass, 0, 255, 0, 20);
 
   let waveform = fft.waveform();
   // Defining a threshold for when the bass is considered to be "high"
@@ -164,6 +165,9 @@ function draw() {
   fill(229, 82, 139);  
   ellipse(115, 455, 45, 30);  
   
+  // Loop over each 'grass' object in the 'smallerGrass'
+  // If the current index 'i' is even then will update with treble frequency
+  // Else will be update with bass frequency 
   for (let i = 0; i < smallerGrass.length; i++) {
     let grass = smallerGrass[i];
     if (i % 2 === 0) { 
@@ -189,6 +193,7 @@ function draw() {
   }
 }
 
+//Draw the red dots kaleidoscope based the waveform and only shows when exceed the bass threshold
 function Kaleidoscope(waveform, bass, bassThreshold) {
   // Check if the bass level exceeds the threshold
   if (bass > bassThreshold) {
@@ -503,17 +508,13 @@ class Small {
     this.lineLength = lineLength;
     this.angleMultiplier = angleMultiplier;
     this.angle = 0;
-    this.startRotationTime = 103;
-    this.changeRotationTime = 139;
-    this.changeRotationTime1 = 160;
+    this.startRotationTime = 73;
     this.endRotationTime = 192;
   }
 
   update (amp) {
     if (song.currentTime() > this.endRotationTime) {
       this.angle = 0;
-    } else if (song.currentTime() > this.changeRotationTime) {
-      this.angle += map(amp, 0, 255, 0, HALF_PI);
     } else if (song.currentTime() > this.startRotationTime) {
       this.angle += map(amp, 0, 255, 0, PI / 10);
     }
@@ -581,18 +582,11 @@ class Leave {
     this.tY2 = tY2;
     this.lAngle = lAngle;
     this.angleOffset = 0;
-    this.startMovetime = 73;
-    this.endMovetime = 192;
   }
   
+  // the angleOffset will oscillate with a cosine wave, scaled by the amplitude.
   update(amplitude) {
-    if (song.currentTime() < this.startMovetime) {
-      this.angleOffset = 0;
-    } else if (song.currentTime() <= this.endMovetime) {
-      this.angleOffset = cos(frameCount * 0.1) * amplitude;
-    } else {
-      this.angleOffset = 0;
-    }
+      this.angleOffset = Math.cos(frameCount * 0.1) * amplitude;
   }
 
   display() {
@@ -605,9 +599,9 @@ class Leave {
       beginShape();
       curveVertex(this.LX1 + i * this.numA, this.LY1 + i * this.numD);
       curveVertex(this.LX1 + i * this.numA, this.LY1 + i * this.numD);
-      curveVertex(this.LX2 + i * this.numB + this.angleOffset, this.LY2 + i * this.numE);
-      curveVertex(this.LX3 + i * this.numC + this.angleOffset, this.LY3 + i * this.numF);
-      curveVertex(this.LX3 + i * this.numC, this.LY3 + i * this.numF);
+      curveVertex(this.LX2 + i * this.numB+ this.angleOffset, this.LY2 + i * this.numE);
+      curveVertex(this.LX3 + i * this.numC+ this.angleOffset, this.LY3 + i * this.numF);
+      curveVertex(this.LX3 + i * this.numC+ this.angleOffset, this.LY3 + i * this.numF);
       endShape();
       pop()
     }
@@ -616,7 +610,7 @@ class Leave {
 
 class Smallerleave {
   //Similar parameters like leave object except less curve will be made
-  constructor(sX1, sY1, sX2, sY2, sX3, sY3, num1, num2, num3, num4, num5, num6, ColorS, tX3, tY3, AngleS, startTime, endTime){
+  constructor(sX1, sY1, sX2, sY2, sX3, sY3, num1, num2, num3, num4, num5, num6, ColorS, tX3, tY3, AngleS){
     this.sX1 = sX1;
     this.sY1 = sY1;
     this.sX2 = sX2;
@@ -633,19 +627,12 @@ class Smallerleave {
     this.tX3 = tX3;
     this.tY3 = tY3;
     this.AngleS = AngleS;
-    this.startTime = startTime; 
-    this.endTime = endTime;  
     this.angleOffset1 = 0;
   }
 
-  // If the current time is between startMovetime and endMovetime,
   // the angleOffset will oscillate with a cosine wave, scaled by the amplitude.
   update(amplitude1) {
-      if (song.currentTime() >= this.startTime && song.currentTime()< this.endTime) {
         this.angleOffset1 = Math.cos(frameCount * 0.1) * amplitude1;
-      } else {
-        this.angleOffset1 = 0;
-      }
     }
 
   display() {
@@ -658,9 +645,9 @@ class Smallerleave {
       beginShape();
       curveVertex(this.sX1 + i * this.num1, this.sY1 + i * this.num4);
       curveVertex(this.sX1 + i * this.num1, this.sY1 + i * this.num4);
-      curveVertex(this.sX2 + i * this.num2, this.sY2 + i * this.num5 + this.angleOffset1);
-      curveVertex(this.sX3 + i * this.num3, this.sY3 + i * this.num6 + this.angleOffset1);
-      curveVertex(this.sX3 + i * this.num3, this.sY3 + i * this.num6 + this.angleOffset1);
+      curveVertex(this.sX2 + i * this.num2 + this.angleOffset1, this.sY2 + i * this.num5);
+      curveVertex(this.sX3 + i * this.num3 + this.angleOffset1, this.sY3 + i * this.num6);
+      curveVertex(this.sX3 + i * this.num3 + this.angleOffset1, this.sY3 + i * this.num6);
       endShape();
       pop()
     }
